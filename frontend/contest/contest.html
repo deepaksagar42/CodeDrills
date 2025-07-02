@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Contest Problems</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+
+    #standings-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-bottom: 2rem;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f1f1f1;
+    }
+
+    .verdict-ac {
+      color: green;
+      font-weight: bold;
+    }
+
+    a.problem-link {
+      color: #007bff;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <h1>📘 Contest Problems</h1>
+
+  <button id="standings-btn">🏆 View Standings</button>
+
+  <table id="problem-table">
+    <thead>
+      <tr>
+        <th>Label</th>
+        <th>Problem Name</th>
+        <th>Verdict</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    const contestId = new URLSearchParams(window.location.search).get("id");
+    let currentUser = null;
+
+    document.getElementById("standings-btn").addEventListener("click", () => {
+      window.location.href = `../admin/standing.html?id=${contestId}`;
+    });
+
+    async function getUser() {
+      const res = await fetch("/api/me", { credentials: "include" });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return data.username;
+    }
+
+    async function loadProblems() {
+      const tbody = document.querySelector("#problem-table tbody");
+      tbody.innerHTML = "<tr><td colspan='3'>Loading...</td></tr>";
+
+      currentUser = await getUser();
+      if (!currentUser) {
+        tbody.innerHTML = "<tr><td colspan='3'>Login required</td></tr>";
+        return;
+      }
+
+      const problemsRes = await fetch(`/api/contest/${contestId}/problems`);
+      const problemsData = await problemsRes.json();
+      const problems = problemsData.problems;
+
+      console.log("✅ Problems:", problems);
+
+      const subsRes = await fetch(`/api/contest/${contestId}/standings`);
+      const standings = await subsRes.json();
+      console.log("📈 Standings:", standings);
+
+      const solvedProblems = new Set();
+      const userData = standings.find(u => u.username === currentUser);
+      if (userData) {
+        for (const [index, data] of Object.entries(userData.problems)) {
+          if (data.acTime) solvedProblems.add(index);
+        }
+      }
+
+      tbody.innerHTML = ""; // Clear loading
+
+      if (!problems.length) {
+        tbody.innerHTML = `<tr><td colspan="3">No problems available.</td></tr>`;
+        return;
+      }
+
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      problems.sort((a, b) => a.index.localeCompare(b.index));
+
+      problems.forEach((p, i) => {
+        const isSolved = solvedProblems.has(p.index);
+        const label = letters[i];
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${label}</td>
+          <td><a class="problem-link" href="https://codeforces.com/contest/${p.contestId}/problem/${p.index}" target="_blank">${p.name}</a></td>
+          <td class="${isSolved ? 'verdict-ac' : ''}">${isSolved ? '✔ Solved' : ''}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    loadProblems().catch(err => {
+      console.error("Error loading contest problems:", err);
+    });
+  </script>
+</body>
+</html>

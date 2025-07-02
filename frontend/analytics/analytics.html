@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codeforces Analytics</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f5f5f5;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .username-display {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+    .change-handle {
+      margin-left: 15px;
+      padding: 5px 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .chart-container {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .chart-title {
+      text-align: center;
+      margin-bottom: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+    }
+    #heatmap {
+      display: flex;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    canvas {
+      max-width: 100%;
+      height: auto;
+    }
+    .full-width {
+      grid-column: 1 / -1;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="username-display" id="usernameDisplay">Loading...</div>
+    <button class="change-handle" onclick="changeCFHandle()">Change Handle</button>
+  </div>
+
+  <div class="dashboard">
+    <div class="chart-container full-width">
+      <div class="chart-title">Submission Heatmap (Last 6 Months)</div>
+      <div id="heatmap"></div>
+    </div>
+
+    <div class="chart-container">
+      <div class="chart-title">Problem Tags Distribution</div>
+      <canvas id="radarChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+      <div class="chart-title">Rating Progress</div>
+      <canvas id="ratingChart"></canvas>
+    </div>
+
+    <div class="chart-container">
+      <div class="chart-title">Submission Accuracy</div>
+      <canvas id="accuracyChart"></canvas>
+    </div>
+  </div>
+
+  <!-- D3.js for heatmap -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+
+  <script>
+    function getOrAskForCFHandle() {
+      let handle = localStorage.getItem("cfHandle");
+      if (!handle) {
+        handle = prompt("Enter your Codeforces handle:");
+        if (handle) localStorage.setItem("cfHandle", handle.trim());
+        else alert("CF handle needed to view analytics.");
+      }
+      return handle;
+    }
+
+ 
+
+    const cfHandle = getOrAskForCFHandle();
+    document.getElementById('usernameDisplay').textContent = cfHandle || 'Guest';
+
+    let submissions = [], ratings = [];
+
+    async function fetchData() {
+      if (!cfHandle) return;
+
+      try {
+        const subRes = await fetch(`https://codeforces.com/api/user.status?handle=${cfHandle}&from=1&count=10000`);
+        const subData = await subRes.json();
+        if (subData.status === "OK") submissions = subData.result;
+
+        const rateRes = await fetch(`https://codeforces.com/api/user.rating?handle=${cfHandle}`);
+        const rateData = await rateRes.json();
+        if (rateData.status === "OK") ratings = rateData.result;
+
+        renderHeatmap();
+        renderRadarChart();
+        renderRatingChart();
+        renderAccuracyChart();
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        alert("Error fetching data. Please check your internet connection and handle.");
+      }
+    }
+
+    function renderHeatmap() {
+      console.log("Rendering heatmap...");
+
+      const counts = {};
+      submissions.forEach(s => {
+        const date = new Date(s.creationTimeSeconds * 1000);
+        const dateStr = date.toISOString().split('T')[0];
+        counts[dateStr] = (counts[dateStr] || 0) + 1;
+      });
+
+      // Create custom D3 heatmap since CalHeatmap is not loading properly
+      const heatmapContainer = d3.select("#heatmap");
+      heatmapContainer.selectAll("*").remove(); // Clear previous content
+
+      const now = new Date();
+      const sixMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 6, 1);
+      
+      const data = [];
+      const current = new Date(sixMonthsAgo);
+      
+      while (current <= now) {
+        const dateStr = current.toISOString().split('T')[0];
+        data.push({
+          date: dateStr,
+          value: counts[dateStr] || 0,
+          dateObj: new Date(current)
+        });
+        current.setDate(current.getDate() + 1);
+      }
+
+      const maxValue = Math.max(...data.map(d => d.value));
+      const colorScale = d3.scaleSequential(d3.interpolateGreens)
+        .domain([0, maxValue]);
+
+      const cellSize = 15;
+      const margin = { top: 20, right: 20, bottom: 20, left: 50 };
+      
+      const svg = heatmapContainer.append("svg")
+        .attr("width", 800)
+        .attr("height", 150);
+
+      // Create tooltip
+      const tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("position", "absolute")
+        .style("visibility", "hidden")
+        .style("background", "rgba(0,0,0,0.8)")
+        .style("color", "white")
+        .style("padding", "5px 10px")
+        .style("border-radius", "4px")
+        .style("font-size", "12px");
+
+      // Group data by week
+      const weeks = d3.groups(data, d => d3.timeWeek(d.dateObj));
+      
+      weeks.forEach((week, weekIndex) => {
+        week[1].forEach((day, dayIndex) => {
+          svg.append("rect")
+            .attr("x", weekIndex * (cellSize + 1) + margin.left)
+            .attr("y", dayIndex * (cellSize + 1) + margin.top)
+            .attr("width", cellSize)
+            .attr("height", cellSize)
+            .attr("fill", day.value === 0 ? "#eee" : colorScale(day.value))
+            .attr("stroke", "#fff")
+            .attr("stroke-width", 1)
+            .on("mouseover", function(event, d) {
+              tooltip.style("visibility", "visible")
+                .text(`${day.date}: ${day.value} submissions`);
+            })
+            .on("mousemove", function(event) {
+              tooltip.style("top", (event.pageY - 10) + "px")
+                .style("left", (event.pageX + 10) + "px");
+            })
+            .on("mouseout", function() {
+              tooltip.style("visibility", "hidden");
+            });
+        });
+      });
+
+      // Add legend
+      const legend = svg.append("g")
+        .attr("transform", `translate(${margin.left}, ${margin.top + 120})`);
+
+      const legendScale = [0, Math.ceil(maxValue / 4), Math.ceil(maxValue / 2), Math.ceil(3 * maxValue / 4), maxValue];
+      
+      legendScale.forEach((value, i) => {
+        legend.append("rect")
+          .attr("x", i * 20)
+          .attr("y", 0)
+          .attr("width", 15)
+          .attr("height", 15)
+          .attr("fill", value === 0 ? "#eee" : colorScale(value));
+        
+        legend.append("text")
+          .attr("x", i * 20 + 7.5)
+          .attr("y", 25)
+          .attr("text-anchor", "middle")
+          .attr("font-size", "10px")
+          .text(value);
+      });
+
+      legend.append("text")
+        .attr("x", -10)
+        .attr("y", 7.5)
+        .attr("text-anchor", "end")
+        .attr("font-size", "12px")
+        .text("Less");
+
+      legend.append("text")
+        .attr("x", legendScale.length * 20)
+        .attr("y", 7.5)
+        .attr("text-anchor", "start")
+        .attr("font-size", "12px")
+        .text("More");
+    }
+   
+    function renderRadarChart() {
+  console.log("Rendering improved tag chart...");
+
+  const tagStats = {};
+
+  submissions.forEach(s => {
+    const tags = s.problem.tags || [];
+    tags.forEach(tag => {
+      if (!tagStats[tag]) {
+        tagStats[tag] = { total: 0, solved: 0 };
+      }
+      tagStats[tag].total++;
+      if (s.verdict === "OK") {
+        tagStats[tag].solved++;
+      }
+    });
+  });
+
+  const tagData = Object.entries(tagStats)
+    .map(([tag, stat]) => ({
+      tag,
+      solved: stat.solved,
+      attempted: stat.total,
+      accuracy: stat.solved / stat.total
+    }))
+    .sort((a, b) => b.attempted - a.attempted)
+    .slice(0, 10); // Top 10 by attempts
+
+  const labels = tagData.map(t => t.tag);
+  const solvedData = tagData.map(t => t.solved);
+  const attemptedData = tagData.map(t => t.attempted - t.solved);
+
+  const ctx = document.getElementById("radarChart").getContext("2d");
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Solved",
+          data: solvedData,
+          backgroundColor: "rgba(54, 162, 235, 0.8)"
+        },
+        {
+          label: "Unsolved Attempts",
+          data: attemptedData,
+          backgroundColor: "rgba(255, 99, 132, 0.8)"
+        }
+      ]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top'
+        },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const total = solvedData[context.dataIndex] + attemptedData[context.dataIndex];
+              const solved = solvedData[context.dataIndex];
+              const accuracy = ((solved / total) * 100).toFixed(1);
+              return `${context.dataset.label}: ${context.raw} (${accuracy}% accuracy)`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          stacked: true,
+          title: {
+            display: true,
+            text: 'Problems Attempted'
+          }
+        },
+        y: {
+          stacked: true
+        }
+      }
+    }
+  });
+}
+
+
+    function renderRatingChart() {
+      if (ratings.length === 0) {
+        document.getElementById("ratingChart").parentElement.innerHTML = 
+          '<div class="chart-title">Rating Progress</div><p style="text-align: center; color: #666;">No rating data available</p>';
+        return;
+      }
+
+      const dates = ratings.map(r => new Date(r.ratingUpdateTimeSeconds * 1000));
+      const vals = ratings.map(r => r.newRating);
+
+      new Chart(document.getElementById("ratingChart"), {
+        type: "line",
+        data: {
+          labels: dates,
+          datasets: [{
+            label: "Rating",
+            data: vals,
+            fill: false,
+            borderColor: "rgb(75, 192, 192)",
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            tension: 0.1
+          }]
+        },
+        options: {
+          scales: {
+            x: { 
+              type: "time", 
+              time: { 
+                unit: "month",
+                displayFormats: {
+                  month: 'MMM yyyy'
+                }
+              }
+            },
+            y: { 
+              beginAtZero: false,
+              title: {
+                display: true,
+                text: 'Rating'
+              }
+            }
+          }
+        }
+      });
+    }
+
+function renderAccuracyChart() {
+  const verdictCounts = {
+    OK: 0,
+    WRONG_ANSWER: 0,
+    TIME_LIMIT_EXCEEDED: 0,
+    MEMORY_LIMIT_EXCEEDED: 0,
+    COMPILATION_ERROR: 0,
+    RUNTIME_ERROR: 0,
+    OTHER: 0
+  };
+
+  submissions.forEach(s => {
+    const verdict = s.verdict;
+    if (verdictCounts.hasOwnProperty(verdict)) {
+      verdictCounts[verdict]++;
+    } else {
+      verdictCounts.OTHER++;
+    }
+  });
+
+  const labels = [];
+  const data = [];
+  const bgColors = [];
+
+  if (verdictCounts.OK > 0) {
+    labels.push(`Accepted (${verdictCounts.OK})`);
+    data.push(verdictCounts.OK);
+    bgColors.push("rgba(75, 192, 192, 0.8)");
+  }
+
+  const verdictColorMap = {
+    WRONG_ANSWER: "rgba(255, 99, 132, 0.8)",
+    TIME_LIMIT_EXCEEDED: "rgba(255, 159, 64, 0.8)",
+    MEMORY_LIMIT_EXCEEDED: "rgba(153, 102, 255, 0.8)",
+    COMPILATION_ERROR: "rgba(201, 203, 207, 0.8)",
+    RUNTIME_ERROR: "rgba(255, 205, 86, 0.8)",
+    OTHER: "rgba(100, 100, 100, 0.8)"
+  };
+
+  Object.entries(verdictCounts).forEach(([verdict, count]) => {
+    if (verdict !== "OK" && count > 0) {
+      labels.push(`${verdict.replaceAll('_', ' ').toLowerCase().replace(/^\w/, c => c.toUpperCase())} (${count})`);
+      data.push(count);
+      bgColors.push(verdictColorMap[verdict] || "rgba(200,200,200,0.8)");
+    }
+  });
+
+  new Chart(document.getElementById("accuracyChart"), {
+    type: "doughnut",
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: bgColors,
+        borderColor: bgColors.map(c => c.replace('0.8', '1')),
+        borderWidth: 2,
+        hoverOffset: 4
+      }]
+    },
+    options: {
+      plugins: {
+        legend: {
+          position: 'bottom'
+        }
+      }
+    }
+  });
+}
+
+
+    fetchData();
+  </script>
+</body>
+</html>

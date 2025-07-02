@@ -1,0 +1,191 @@
+body {
+  font-family: system-ui, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #f4f6f8;
+}
+
+/* Navbar */
+.nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem;
+  background: #2c3e50;
+  justify-content: center;
+}
+
+.tab-btn {
+  padding: 0.6rem 1rem;
+  border: none;
+  background: #34495e;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.tab-btn:hover {
+  background: #1abc9c;
+}
+
+.tab-btn.active {
+  background: #1abc9c;
+  color: black;
+}
+
+/* Sections */
+.section {
+  display: none;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.section.active {
+  display: block;
+}
+
+h2 {
+  margin-top: 0;
+  font-size: 1.5rem;
+}
+
+/* Buttons */
+button {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+}
+
+#applyFiltersBtn,
+#addSelectedBtn,
+#saveProblemsBtn {
+  background-color: #3498db;
+  color: white;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+#applyFiltersBtn:hover,
+#addSelectedBtn:hover,
+#saveProblemsBtn:hover {
+  background-color: #2980b9;
+}
+
+#assignedProblems button {
+  margin-left: 1rem;
+  background: red;
+  color: white;
+  border: none;
+}
+
+/* Box styles */
+.problem-box, .assigned-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 8px;
+  margin: 6px 0;
+  background: #f9f9f9;
+}
+
+.problem-title {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.add-btn, .remove-btn {
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background 0.2s ease;
+}
+
+.add-btn:hover {
+  background-color: #4338ca;
+}
+
+.remove-btn {
+  background-color: #ef4444;
+}
+
+.remove-btn:hover {
+  background-color: #dc2626;
+}
+
+/* Filters and Problem Columns */
+#ratingFilter, #tagFilter {
+  padding: 0.4rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+#problemList {
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  background: white;
+}
+
+/* Table responsive */
+#signup-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  background: white;
+}
+
+#signup-table th, #signup-table td {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  text-align: left;
+}
+
+@media (max-width: 768px) {
+  .nav {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .section {
+    padding: 1rem;
+  }
+
+  .section > div {
+    flex-direction: column !important;
+  }
+
+  #signup-table, #signup-table thead, #signup-table tbody, #signup-table th, #signup-table td, #signup-table tr {
+    display: block;
+  }
+
+  #signup-table thead {
+    display: none;
+  }
+
+  #signup-table td {
+    position: relative;
+    padding-left: 50%;
+    text-align: right;
+  }
+
+  #signup-table td::before {
+    position: absolute;
+    top: 0;
+    left: 0.5rem;
+    width: 45%;
+    white-space: nowrap;
+    font-weight: bold;
+    content: attr(data-label);
+    text-align: left;
+  }
+}

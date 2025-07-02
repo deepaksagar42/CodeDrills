@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home - CodeDrills</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+<body class="bg-gray-900 text-white min-h-screen font-sans">
+
+  <!-- ✅ NAVBAR -->
+  <header class="bg-gray-900 text-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap">
+
+      <!-- Logo -->
+      <div class="flex items-center gap-2 text-white text-xl font-bold">
+        <svg viewBox="0 0 48 48" fill="none" width="32" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" clip-rule="evenodd"
+            d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z"
+            fill="currentColor" />
+        </svg>
+        CodeDrills
+      </div>
+
+      <!-- Hamburger (mobile) -->
+      <button id="nav-toggle" class="lg:hidden text-white text-2xl focus:outline-none">
+        ☰
+      </button>
+
+      <!-- NAV MENU -->
+      <div id="nav-menu"
+        class="w-full mt-4 flex-col lg:flex lg:flex-row lg:items-center lg:w-auto lg:mt-0 hidden gap-4 text-sm font-medium">
+
+        <!-- Nav Links -->
+        <nav class="flex flex-col lg:flex-row gap-2 lg:gap-6 items-start lg:items-center">
+          <a href="/home/home.html" class="hover:text-blue-400">Home</a>
+          <a href="/problemset/problemset.html" class="hover:text-blue-400">Problemset</a>
+          <a href="/friends/friends.html" class="hover:text-blue-400">Friends</a>
+          <a href="/analytics/analytics.html" class="hover:text-blue-400">Analysis</a>
+          <a href="#" class="hover:text-blue-400">Help</a>
+        </nav>
+
+        <!-- Buttons -->
+        <div class="flex flex-col lg:flex-row gap-2 lg:gap-3 mt-4 lg:mt-0 w-full lg:w-auto">
+          <a href="/createcontest/createcontest.html"
+            class="bg-white text-gray-900 hover:bg-blue-600 hover:text-white px-4 py-2 rounded-md font-semibold text-center transition-all duration-300">
+            Create Contest
+          </a>
+          <a href="/managecontest/manage.html"
+            class="bg-white text-gray-900 hover:bg-yellow-600 hover:text-white px-4 py-2 rounded-md font-semibold text-center transition-all duration-300">
+            Manage Contest
+          </a>
+
+          <!-- Auth Section -->
+         <!-- Auth Section -->
+<div class="relative text-sm" id="auth-section">
+  <!-- Sign In -->
+  <button id="signin-btn"
+    class="bg-white text-gray-900 hover:bg-gray-700 hover:text-white px-4 py-2 rounded-md font-semibold transition-all duration-300">
+    Sign In
+  </button>
+
+  <!-- User Dropdown -->
+  <div id="user-dropdown" class="relative inline-block hidden">
+    <button id="user-toggle"
+      class="bg-white text-gray-900 hover:bg-gray-700 hover:text-white px-4 py-2 rounded-md font-semibold flex items-center gap-1 transition">
+      <span id="username">User</span> ⌄
+    </button>
+    <div id="dropdown-menu"
+      class="absolute right-0 mt-1 bg-white text-black rounded shadow hidden z-50 min-w-[120px]">
+      <button id="logout-btn"
+        class="block w-full text-left px-4 py-2 hover:bg-gray-100">Logout</button>
+    </div>
+  </div>
+</div>
+
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ✅ MAIN CONTENT -->
+  <main class="p-6 max-w-4xl mx-auto">
+    <div id="live-contests" class="mt-6 space-y-4">
+      <!-- Live contests will appear here -->
+    </div>
+
+    <div id="dashboard-actions" class="hidden mt-8 flex flex-wrap gap-4 justify-center">
+      <a href="/home/upcoming/upcoming.html"
+         class="bg-blue-600 hover:bg-blue-800 text-white px-6 py-3 rounded-lg font-semibold shadow transition">
+        📅 Upcoming Contests
+      </a>
+      <a href="/home/past/past.html"
+         class="bg-gray-700 hover:bg-gray-800 text-white px-6 py-3 rounded-lg font-semibold shadow transition">
+        📜 Past Contest History
+      </a>
+    </div>
+  </main>
+
+  <!-- ✅ SCRIPTS -->
+
+  <script src="/home/home.js"></script>
+</body>
+</html>

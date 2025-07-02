@@ -1,0 +1,74 @@
+/* public/friends.css */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f3f4f6;
+  padding: 30px;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+h2 {
+  text-align: center;
+  color: #333;
+}
+
+.add-friend {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.add-friend input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.add-friend button {
+  padding: 10px 16px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.add-friend button:hover {
+  background-color: #1e40af;
+}
+
+#friendsList {
+  list-style: none;
+  padding: 0;
+}
+
+#friendsList li {
+  background-color: #e5e7eb;
+  padding: 10px 14px;
+  margin-bottom: 8px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.remove-btn {
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.remove-btn:hover {
+  background-color: #b91c1c;
+}

@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Problemset - Codearena</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+    }
+
+    .navbar {
+      background-color: #2a2a2a;
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 20px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .navbar a {
+      color: #f0f0f0;
+      text-decoration: none;
+      margin-right: 15px;
+    }
+
+    .navbar a.active {
+      font-weight: bold;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .handle-box {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .handle-box input {
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #444;
+      background-color: #3a3a3a;
+      color: #f0f0f0;
+      width: 130px;
+    }
+
+    .handle-box button {
+      padding: 4px 10px;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+
+    .handle-box button:hover {
+      background-color: #0056b3;
+    }
+
+    .filter-bar {
+      background-color: #2a2a2a;
+      padding: 10px 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-bar select,
+    .filter-bar input,
+    .filter-bar button {
+      background-color: #3a3a3a;
+      color: #f0f0f0;
+      border: 1px solid #555;
+      padding: 5px 10px;
+      border-radius: 4px;
+    }
+
+    .problem-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 10px 0;
+    }
+
+    .problem-table th, .problem-table td {
+      border: 1px solid #555;
+      padding: 8px;
+    }
+
+    .problem-table th {
+      background-color: #2a2a2a;
+    }
+
+    .problem-table tbody tr:nth-child(even) {
+      background-color: #2e2e2e;
+    }
+
+    .problem-table tbody tr:hover {
+      background-color: #3a3a3a;
+    }
+
+    .problem-table a {
+      color: #7abaff;
+      text-decoration: none;
+    }
+
+    @media (max-width: 600px) {
+      .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .nav-right {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-left">
+    <a href="/Home/home.html">Home</a>
+  </div>
+  <div class="nav-right">
+    <span id="usernameDisplay">User</span>
+    <div class="handle-box">
+      <input type="text" id="cfHandleInput" placeholder="CF handle" />
+      <button id="saveHandleBtn">Change</button>
+    </div>
+  </div>
+</nav>
+
+<!-- Filter bar -->
+<div class="filter-bar">
+  <select id="tagSelect">
+    <option value="">All Tags</option>
+  </select>
+  <input type="number" id="minRating" placeholder="Min Rating" min="800" max="3500" />
+  <input type="number" id="maxRating" placeholder="Max Rating" min="800" max="3500" />
+  <button id="btnWeakTopics">Weak Topics</button>
+  <button id="btnUnexplored">Unexplored</button>
+  <button id="applyFiltersBtn">Apply Filters</button>
+</div>
+
+<!-- Problem table -->
+<table id="problemTable" class="problem-table">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+      <th>Tags</th>
+      <th>Rating</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td colspan="4">Loading problems...</td></tr>
+  </tbody>
+</table>
+
+<script>
+let allProblems = [];
+let userSubmissions = [];
+let solvedSet = new Set();
+let attemptedSet = new Set();
+let allTags = new Set();
+let userHandle = '';
+let username = '';
+let handleKey = '';
+
+// On load
+window.onload = async () => {
+  try {
+    const res = await fetch("/api/me", { credentials: "include" });
+    if (res.ok) {
+      const data = await res.json();
+      username = data.username || '';
+    }
+  } catch (err) {
+    username = '';
+  }
+
+  document.getElementById('usernameDisplay').textContent = username || 'User';
+  localStorage.setItem("username", username);
+  handleKey = `cfHandle_${username}`;
+
+  userHandle = localStorage.getItem(handleKey) || '';
+  document.getElementById('cfHandleInput').value = userHandle;
+
+  // Save handle change
+  document.getElementById('saveHandleBtn').onclick = () => {
+    const newHandle = document.getElementById('cfHandleInput').value.trim();
+    if (newHandle) {
+      localStorage.setItem(handleKey, newHandle);
+      location.reload();
+    }
+  };
+
+  if (userHandle) fetchProblems();
+};
+
+// Fetch problems
+async function fetchProblems() {
+  const response = await fetch('https://codeforces.com/api/problemset.problems');
+  const data = await response.json();
+
+  if (data.status === 'OK') {
+    allProblems = data.result.problems;
+    allProblems.forEach(p => p.tags.forEach(tag => allTags.add(tag)));
+    populateTags();
+    await fetchUserSubmissions(userHandle);
+    renderProblems(allProblems);
+  } else {
+    document.querySelector('#problemTable tbody').innerHTML = '<tr><td colspan="4">Failed to load.</td></tr>';
+  }
+}
+
+function populateTags() {
+  const tagSelect = document.getElementById('tagSelect');
+  Array.from(allTags).sort().forEach(tag => {
+    const option = document.createElement('option');
+    option.value = tag;
+    option.textContent = tag;
+    tagSelect.appendChild(option);
+  });
+}
+
+async function fetchUserSubmissions(handle) {
+  const res = await fetch(`https://codeforces.com/api/user.status?handle=${handle}&from=1&count=1000`);
+  const data = await res.json();
+
+  if (data.status === "OK") {
+    userSubmissions = data.result;
+    userSubmissions.forEach(sub => {
+      const key = `${sub.problem.contestId}${sub.problem.index}`;
+      if (sub.verdict === 'OK') {
+        solvedSet.add(key);
+      } else if (!solvedSet.has(key)) {
+        attemptedSet.add(key);
+      }
+    });
+  } else {
+    alert("Please give correct handle");
+  }
+}
+
+function renderProblems(problems) {
+  const tbody = document.querySelector('#problemTable tbody');
+  tbody.innerHTML = '';
+
+  if (problems.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4">No problems found.</td></tr>';
+    return;
+  }
+
+  problems.forEach(p => {
+    const url = `https://codeforces.com/contest/${p.contestId}/problem/${p.index}`;
+    const tags = p.tags.join(', ');
+    const rating = p.rating || 'N/A';
+    const key = `${p.contestId}${p.index}`;
+    let rowColor = '';
+
+    if (solvedSet.has(key)) {
+      rowColor = 'style="background-color: #004d00;"'; // green
+    } else if (attemptedSet.has(key)) {
+      rowColor = 'style="background-color: #4d0000;"'; // red
+    }
+
+    tbody.insertAdjacentHTML('beforeend', `
+      <tr ${rowColor}>
+        <td>${key}</td>
+        <td><a href="${url}" target="_blank">${p.name}</a></td>
+        <td>${tags}</td>
+        <td>${rating}</td>
+      </tr>
+    `);
+  });
+}
+
+function applyFilters() {
+  const selectedTag = document.getElementById('tagSelect').value;
+  const minRating = parseInt(document.getElementById('minRating').value) || 0;
+  const maxRating = parseInt(document.getElementById('maxRating').value) || 5000;
+
+  const filtered = allProblems.filter(p => {
+    const rating = p.rating || 0;
+    if (rating < minRating || rating > maxRating) return false;
+    if (selectedTag && !p.tags.includes(selectedTag)) return false;
+    return true;
+  });
+
+  renderProblems(filtered);
+}
+
+document.getElementById('applyFiltersBtn').addEventListener('click', applyFilters);
+
+// Weak Topics
+document.getElementById('btnWeakTopics').addEventListener('click', () => {
+  const counts = {};
+  userSubmissions.forEach(sub => {
+    const key = `${sub.problem.contestId}${sub.problem.index}`;
+    if (!solvedSet.has(key) && sub.verdict !== 'OK') {
+      counts[key] = (counts[key] || 0) + 1;
+    }
+  });
+  const weak = allProblems.filter(p => counts[`${p.contestId}${p.index}`] >= 2);
+  renderProblems(weak);
+});
+
+// Unexplored
+document.getElementById('btnUnexplored').addEventListener('click', () => {
+  const explored = new Set([...solvedSet, ...attemptedSet]);
+  const unexplored = allProblems.filter(p => !explored.has(`${p.contestId}${p.index}`));
+  renderProblems(unexplored);
+});
+</script>
+</body>
+</html>

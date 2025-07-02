@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Join Contest – Codearena</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
+  </head>
+  <body class="bg-gray-950 text-white min-h-screen font-sans">
+    <!-- Header -->
+    <header class="bg-gray-900 border-b border-gray-800 shadow-sm">
+      <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold flex items-center gap-2">
+          <svg viewBox="0 0 48 48" fill="none" width="32" xmlns="http://www.w3.org/2000/svg">
+            <path
+              fill-rule="evenodd"
+              clip-rule="evenodd"
+              d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z"
+              fill="currentColor"
+            ></path>
+          </svg>
+          Codearena
+        </h1>
+        <a href="/home/home.html" class="text-sm text-gray-300 hover:text-white">🏠 Back to Home</a>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-xl mx-auto px-4 py-12 text-center space-y-6">
+      <!-- Contest Title -->
+      <h2 id="contestName" class="text-3xl font-bold text-white animate-pulse">
+        Loading Contest...
+      </h2>
+
+      <!-- Countdown -->
+      <div
+        id="countdown"
+        class="text-lg text-gray-400 bg-gray-800 rounded-md py-3 px-5 inline-block font-mono tracking-wide shadow-md"
+      >
+        ⏳ Countdown loading...
+      </div>
+
+      <!-- Join Button -->
+      <div id="joinSection">
+        <button
+          id="openSignupBtn"
+          class="mt-4 bg-white text-gray-900 hover:bg-blue-600 hover:text-white px-6 py-2 rounded-md font-semibold transition-all duration-300 shadow"
+        >
+          Join Contest
+        </button>
+      </div>
+
+      <!-- CF Handle Prompt -->
+      <div
+        id="cfHandlePrompt"
+        class="hidden bg-gray-800 p-6 rounded-md shadow-md space-y-4"
+      >
+        <p class="text-lg font-medium">Please enter your Codeforces handle:</p>
+        <input
+          type="text"
+          id="cfHandleInput"
+          placeholder="e.g., tourist"
+          class="w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-md text-white focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          class="bg-white text-gray-900 hover:bg-blue-600 hover:text-white px-6 py-2 rounded-md font-semibold transition-all duration-300 shadow"
+          id="confirmCfHandleBtn"
+        >
+          Confirm & Join
+        </button>
+      </div>
+    </main>
+
+    <!-- Script -->
+    <script>
+      const contestId = new URLSearchParams(window.location.search).get("id");
+      const contestNameEl = document.getElementById("contestName");
+      const countdownEl = document.getElementById("countdown");
+      const signupBtn = document.getElementById("openSignupBtn");
+      const cfPrompt = document.getElementById("cfHandlePrompt");
+      const cfInput = document.getElementById("cfHandleInput");
+      const cfConfirmBtn = document.getElementById("confirmCfHandleBtn");
+
+      async function fetchContestData() {
+        try {
+          const res = await fetch(`/api/contest/${contestId}`);
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.message || "Contest not found");
+
+          contestNameEl.textContent = data.name || "Untitled Contest";
+          startCountdown(new Date(data.startTime));
+        } catch (err) {
+          contestNameEl.textContent = "Contest not found";
+          countdownEl.textContent = "";
+          console.error("❌ Error:", err.message);
+        }
+      }
+
+     function startCountdown(startTime) {
+  const timer = setInterval(() => {
+    const now = new Date();
+    const diff = startTime - now;
+
+    if (diff <= 0) {
+      clearInterval(timer);
+      countdownEl.textContent = "✅ Contest is live!";
+      countdownEl.classList.remove("text-gray-400");
+      countdownEl.classList.add("text-green-400");
+    } else {
+      const totalSeconds = Math.floor(diff / 1000);
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+
+      countdownEl.textContent = `⏱ Starts in: ${hours}h ${minutes}m ${seconds}s`;
+    }
+  }, 1000);
+}
+
+
+      signupBtn.addEventListener("click", () => {
+        const username = localStorage.getItem("username");
+        const email = localStorage.getItem("email");
+
+        if (!username || !email) {
+          window.location.href = `/login/login.html?redirect=contest&id=${contestId}`;
+        } else {
+          handleSignupIfNeeded(username, email);
+        }
+      });
+
+      window.onload = () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirect = urlParams.get("redirect");
+
+        if (redirect === "contest") {
+          const username = localStorage.getItem("username");
+          const email = localStorage.getItem("email");
+
+          if (username && email) {
+            handleSignupIfNeeded(username, email);
+          }
+        }
+      };
+
+      async function handleSignupIfNeeded(username, email) {
+        try {
+          const res = await fetch(`/api/contest/${contestId}`);
+          const contest = await res.json();
+
+          const already = contest.signups.find((u) => u.username === username);
+          if (already) {
+            alert("✅ You have already joined this contest!");
+            signupBtn.disabled = true;
+            signupBtn.textContent = "Already Joined";
+            return;
+          }
+
+          signupBtn.classList.add("hidden");
+          cfPrompt.classList.remove("hidden");
+
+          cfConfirmBtn.addEventListener("click", async () => {
+            const codeforceshandle = cfInput.value.trim();
+            if (!codeforceshandle) {
+              alert("⚠️ Please enter your Codeforces handle.");
+              return;
+            }
+
+            try {
+              const signupRes = await fetch(
+                `/api/contest/${contestId}/signup`,
+                {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    username,
+                    email,
+                    codeforceshandle,
+                  }),
+                }
+              );
+
+              const data = await signupRes.json();
+              if (signupRes.ok) {
+                alert("🎉 Successfully joined contest!");
+                window.location.href = "/home/home.html";
+              } else {
+                alert("⚠️ Signup failed: " + data.message);
+              }
+            } catch (err) {
+              console.error("❌ Signup error:", err.message);
+            }
+          });
+        } catch (err) {
+          console.error("❌ Error fetching contest:", err.message);
+        }
+      }
+
+      fetchContestData();
+    </script>
+  </body>
+</html>

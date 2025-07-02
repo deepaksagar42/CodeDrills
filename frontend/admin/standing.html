@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Contest Standings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      color: #333;
+      padding: 2rem;
+    }
+
+    h1 {
+      text-align: center;
+      color: #222;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+      background: #fff;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background-color: #f8f8f8;
+    }
+
+    .ac {
+      color: green;
+      font-weight: bold;
+    }
+
+    .wa {
+      color: red;
+      font-weight: bold;
+    }
+
+    #last-updated {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #666;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>🏆 Contest Standings</h1>
+  
+  <table id="leaderboard">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Username</th>
+        <th>Solved</th>
+        <th>Details</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="last-updated">Last updated: --</div>
+
+  <script>
+
+    const contestId = new URLSearchParams(window.location.search).get("id");
+    const tbody = document.querySelector("#leaderboard tbody");
+    const lastUpdated = document.getElementById("last-updated");
+
+    async function fetchStandings() {
+      try {
+        const res = await fetch(`/api/contest/${contestId}/standings`);
+        const data = await res.json();
+
+        tbody.innerHTML = ""; 
+
+            data.forEach((user, idx) => {
+            const tr = document.createElement("tr");
+
+            const detail = Object.entries(user.problems).map(([pid, p]) => {
+            const vlist = p.verdicts.map(v =>
+              `<span class="${v.verdict === 'OK' ? 'ac' : 'wa'}">${v.verdict}</span>`
+            ).join(", ");
+            return `<b>${pid}</b>: ${p.attempts} attempts (${vlist})`;
+          }).join("<br>");
+
+          tr.innerHTML = `
+            <td>${idx + 1}</td>
+            <td>${user.username}</td>
+            <td>${user.problemsSolved}</td>
+            <td>${detail}</td>
+          `;
+
+          tbody.appendChild(tr);
+        });
+
+        // Update timestamp
+        const now = new Date();
+        lastUpdated.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+      } catch (err) {
+        console.error("Failed to fetch standings:", err);
+        lastUpdated.textContent = "Error updating standings.";
+      }
+    }
+
+    // First load
+    fetchStandings();
+
+    // Auto refresh every 10 seconds
+    setInterval(fetchStandings, 10000);
+  </script>
+</body>
+</html>
