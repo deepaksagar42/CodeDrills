@@ -1,4 +1,4 @@
-const backendUrl = "http://localhost:3000";
+const backendUrl = "https://codedrills.onrender.com";
 const contestListEl = document.getElementById("contestList");
 
 async function fetchUserContests() {
