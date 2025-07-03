@@ -24,7 +24,7 @@ app.use(session({
 }));
 
 app.use(cors({
-  origin: "http://localhost:3000", 
+  origin: "https://codedrills.onrender.com", 
   credentials: true,
 }));
 

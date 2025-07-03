@@ -1,6 +1,6 @@
 const ContestModel = require("../models/contestmodels");
 const Submission = require("../models/submissionmodels");
-const Contest = require("../models/contestmodels");
+const { Contest } = require("../models/contestmodels"); // ✅ This gives you just the Mongoose model
 
 const { sendInviteEmail } = require("../services/emailService");
 const User=require("../models/user");
@@ -251,11 +251,11 @@ const getLiveContestsForUser = async (req, res) => {
   const now = new Date();
     console.log("🔍 Looking up live contests for username:", username);
   try {
-    const liveContests = await Contest.find({
-    "signups.username": username,
-      startTime: { $lte: now },
-      endTime: { $gte: now }
-    });
+   const liveContests = await Contest.find({   // ✅ Mongoose model method
+  "signups.username": username,
+  startTime: { $lte: now },
+  endTime: { $gte: now }
+});
 
     res.json({ liveContests });
   } catch (err) {
