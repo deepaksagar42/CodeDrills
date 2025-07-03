@@ -21,7 +21,7 @@
           </svg>
           Codearena
         </h1>
-        <a href="/home/home.html" class="text-sm text-gray-300 hover:text-white">🏠 Back to Home</a>
+        <a href="/Home/home.html" class="text-sm text-gray-300 hover:text-white">🏠 Back to Home</a>
       </div>
     </header>
 
@@ -183,7 +183,7 @@
               const data = await signupRes.json();
               if (signupRes.ok) {
                 alert("🎉 Successfully joined contest!");
-                window.location.href = "/home/home.html";
+                window.location.href = "/Home/home.html";
               } else {
                 alert("⚠️ Signup failed: " + data.message);
               }
