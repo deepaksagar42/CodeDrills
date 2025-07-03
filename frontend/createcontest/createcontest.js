@@ -30,7 +30,7 @@
 });
 
     try {
-      const response = await fetch('http://localhost:3000/api/createcontest', {
+      const response = await fetch('https://codedrills.onrender.com/api/createcontest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(obj)
