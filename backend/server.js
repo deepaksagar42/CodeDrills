@@ -46,7 +46,7 @@ const friendsRoutes=require("./routes/friendsroutes");
 app.use("/friends", friendsRoutes);
 
 app.get("/", (req, res) => {
-  res.sendFile(path.join(frontendPath, "home/home.html"));
+  res.sendFile(path.join(frontendPath, "Home/home.html"));
 });
 
 app.listen(PORT, () => {
