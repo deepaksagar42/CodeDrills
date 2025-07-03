@@ -38,7 +38,7 @@ signupForm.addEventListener("submit", async (e) => {
      {
         localStorage.setItem("username", data.username);
         localStorage.setItem("email", data.email);
-       window.location.href = "/home/home.html";
+       window.location.href = "/Home/home.html";
         } else {
     alert(data.message || "Login failed");
   
@@ -72,7 +72,7 @@ loginForm.addEventListener("submit", async (e) => {
       // ✅ Redirect to join-contest page with contest ID
       window.location.href = `/join-contest.html?id=${contestId}&redirect=contest`;
     } else {
-      window.location.href = "/home/home.html";
+      window.location.href = "/Home/home.html";
     }
   }
 });
