@@ -45,6 +45,9 @@ app.use("/api", userContestRoutes);
 const friendsRoutes=require("./routes/friendsroutes");
 app.use("/friends", friendsRoutes);
 
+app.get("/", (req, res) => {
+  res.sendFile(path.join(frontendPath, "home/home.html"));
+});
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
