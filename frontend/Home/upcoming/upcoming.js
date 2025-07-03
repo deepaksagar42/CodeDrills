@@ -4,7 +4,7 @@
   if (!username) return (window.location.href = "/login/login.html");
 
   try {
-    const res = await fetch(`http://localhost:3000/api/user-contests/${username}`);
+    const res = await fetch(`https://codedrills.onrender.com/api/user-contests/${username}`);
     const data = await res.json();
 
     const now = new Date();
@@ -73,7 +73,7 @@
           signupsDiv.classList.remove("hidden");
 
           try {
-            const res = await fetch(`http://localhost:3000/api/contest/${contest._id}/signups`);
+            const res = await fetch(`https://codedrills.onrender.com/api/contest/${contest._id}/signups`);
             const data = await res.json();
 
             if (!data.signups?.length) {

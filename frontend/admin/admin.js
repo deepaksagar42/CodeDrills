@@ -2,7 +2,7 @@ let allProblems = [];
 let assignedProblems = [];
 const contestId = new URLSearchParams(window.location.search).get('id');
 console.log("📦 contestId from URL:", contestId);
-const backendUrl = "http://localhost:3000";
+const backendUrl = "https://codedrills.onrender.com";
 
 async function fetchCodeforcesProblems() {
   try {
@@ -174,7 +174,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 
 async function loadContestDetails() {
   try {
-    const res = await fetch(`http://localhost:3000/api/contest/${contestId}`);
+    const res = await fetch(`https://codedrills.onrender.com/api/contest/${contestId}`);
     const data = await res.json();
 
     if (!res.ok) throw new Error(data.message || "Failed to load contest details");
@@ -210,7 +210,7 @@ document.getElementById("saveProblemsBtn").addEventListener("click", async () =>
       return;
     }
 
-  const res = await fetch(`http://localhost:3000/api/contest/${contestId}/add-problems`, {
+  const res = await fetch(`https://codedrills.onrender.com/api/contest/${contestId}/add-problems`, {
 
       method: "POST",
       headers: {
@@ -232,7 +232,7 @@ document.getElementById("saveProblemsBtn").addEventListener("click", async () =>
 async function loadAssignedProblems() {
  
   try {
-    const res = await fetch(`http://localhost:3000/api/contest/${contestId}/problems`);
+    const res = await fetch(`https://codedrills.onrender.com/api/contest/${contestId}/problems`);
     const data = await res.json();
     console.log("👀 assignedProblems from DB:", data.problems);
     if (!res.ok) throw new Error(data.error);
@@ -256,7 +256,7 @@ async function signupUserIfNew() {
     const email = localStorage.getItem("email"); // ✅ fetch email too
     if (!username || !email) return;
 
-    const res = await fetch(`http://localhost:3000/api/contest/${contestId}/signup`, {
+    const res = await fetch(`https://codedrills.onrender.com/api/contest/${contestId}/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, email }) // ✅ send both
@@ -274,7 +274,7 @@ async function signupUserIfNew() {
 
 async function fetchSignups() {
   try {
-    const res = await fetch(`http://localhost:3000/api/contest/${contestId}/signups`);
+    const res = await fetch(`https://codedrills.onrender.com/api/contest/${contestId}/signups`);
     const data = await res.json();
 
     if (!res.ok) throw new Error(data.message);

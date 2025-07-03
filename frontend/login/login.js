@@ -24,7 +24,7 @@ signupForm.addEventListener("submit", async (e) => {
   const username = signupForm.querySelector('input[type="text"]').value.trim();
   const password = signupForm.querySelector('input[type="password"]').value;
 
-  const res = await fetch("http://localhost:3000/api/signup", {
+  const res = await fetch("https://codedrills.onrender.com/api/signup", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, username, password }),
@@ -50,7 +50,7 @@ loginForm.addEventListener("submit", async (e) => {
   const identifier = loginForm.querySelector('input[type="text"]').value.trim();
   const password = loginForm.querySelector('input[type="password"]').value;
 
-  const res = await fetch("http://localhost:3000/api/login", {
+  const res = await fetch("https://codedrills.onrender.com/api/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ identifier, password }),
