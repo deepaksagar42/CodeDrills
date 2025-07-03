@@ -8,7 +8,7 @@
   }
 
   try {
-    const res = await fetch(`http://localhost:3000/api/user-contests/${username}`);
+    const res = await fetch(`https://codedrills.onrender.com/api/user-contests/${username}`);
     const data = await res.json();
 
     const now = new Date();
