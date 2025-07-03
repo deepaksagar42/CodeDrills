@@ -1,5 +1,6 @@
 const ContestModel = require("../models/contestmodels");
 const Submission = require("../models/submissionmodels");
+const Contest = require("../models/contestmodels");
 
 const { sendInviteEmail } = require("../services/emailService");
 const User=require("../models/user");
