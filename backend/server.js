@@ -17,6 +17,10 @@ mongoose.connect(process.env.MONGO_URI)
 
 app.use(express.json());
 
+app.use(cors({
+  origin: "https://codedrills.onrender.com", 
+  credentials: true,
+}));
 
 app.use(session({
   secret: "your-secret-key",
@@ -30,7 +34,7 @@ app.use(session({
   cookie: {
     httpOnly: true,
     secure: false, // true if you're using HTTPS
-     sameSite: "none", 
+     sameSite: "lax", 
     maxAge: 1000 * 60 * 60 * 24 * 7 // 💾 7 days (in ms)
   }
 }));
@@ -38,10 +42,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(cors({
-  origin: "https://codedrills.onrender.com", 
-  credentials: true,
-}));
+
 
 
 const frontendPath = path.join(__dirname, "../frontend");
