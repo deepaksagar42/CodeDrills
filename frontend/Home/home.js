@@ -4,9 +4,12 @@
   const usernameSpan = document.getElementById("username");
   const pastContest = document.getElementById("dashboard-actions");
 
+  const guestSection = document.getElementById("guest-hero");
+  const whyUsSection = document.getElementById("why-us");
+  const footer = document.getElementById("foot");
+
   try {
     const res = await fetch("/api/me", { credentials: "include" });
-
     if (res.ok) {
       const data = await res.json();
       usernameSpan.textContent = data.username;
@@ -15,7 +18,11 @@
       pastContest.classList.remove("hidden");
       window.isAuthenticated = true;
 
-      // 👇👇 ADD THIS PART TO FETCH LIVE CONTESTS 👇👇
+       if (guestSection) guestSection.style.display = "none";
+      if (whyUsSection) whyUsSection.style.display = "none";
+      if (footer) footer.style.display = "none";
+
+       attachProtection();
       fetch(`/api/contests/live?username=${data.username}`)
         .then(res => res.json())
         .then(({ liveContests }) => {
@@ -47,12 +54,15 @@
       throw new Error("Not logged in");
     }
   } catch (err) {
+    attachProtection();
     signinBtn.classList.remove("hidden");
     userDropdown.classList.add("hidden");
     window.isAuthenticated = false;
+      if (guestSection) guestSection.style.display = "block";
+    if (whyUsSection) whyUsSection.style.display = "block";
+    if (footer) footer.style.display = "block";
   }
 
-  attachProtection();
 };
 
     document.getElementById("signin-btn").addEventListener("click", () => {
@@ -71,6 +81,7 @@
       });
       sessionStorage.removeItem("username");
       window.isAuthenticated = false;
+      localStorage.removeItem("isLogged");
       window.location.href = "/home/home.html";
     });
 
@@ -86,3 +97,4 @@
         });
       });
     }
+   

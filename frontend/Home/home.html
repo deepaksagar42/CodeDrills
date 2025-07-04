@@ -33,7 +33,7 @@
 
         <!-- Nav Links -->
         <nav class="flex flex-col lg:flex-row gap-2 lg:gap-6 items-start lg:items-center">
-          <a href="/Home/home.html" class="hover:text-blue-400">Home</a>
+          <a href="/Home/home.html" class="hover:text-blue-400 ">Home</a>
           <a href="/problemset/problemset.html" class="hover:text-blue-400 require-login">Problemset</a>
           <a href="/friends/friends.html" class="hover:text-blue-400 require-login">Friends</a>
           <a href="/analytics/analytics.html" class="hover:text-blue-400 require-login">Analysis</a>
@@ -96,6 +96,44 @@
       </a>
     </div>
   </main>
+
+  <section id="guest-hero" class="text-center py-16 px-6 rounded-lg bg-gradient-to-br from-purple-800 to-indigo-900 text-white shadow-lg">
+  <h1 class="text-4xl lg:text-5xl font-extrabold mb-4">Welcome to Coder Arena</h1>
+  <p class="text-lg lg:text-xl mb-6 font-light max-w-2xl mx-auto">Your ultimate destination for competitive programming. Join contests, track your friends, and improve your skills—all in one place.</p>
+  <div class="flex justify-center gap-4">
+    <a href="/login/login.html" class="bg-white text-gray-900 hover:bg-gray-800 hover:text-white px-6 py-3 rounded-md font-semibold transition">
+      Sign In / Register
+    </a>
+    <a href="#why-us" class="bg-blue-600 hover:bg-blue-800 text-white px-6 py-3 rounded-md font-semibold transition">
+      Why Choose Us?
+    </a>
+  </div>
+</section>
+
+<!-- 💡 Why Choose Us Section -->
+<section id="why-us" class="mt-20 text-center max-w-4xl mx-auto">
+  <h2 class="text-3xl font-bold mb-4 text-blue-300">Why Choose Coder Arena?</h2>
+  <p class="text-gray-300 mb-6">We provide tools and features that elevate your problem-solving game:</p>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left text-sm">
+    <div class="bg-gray-800 p-4 rounded-lg shadow">
+      <h3 class="text-lg font-semibold text-white">💥 Custom Contests</h3>
+      <p class="text-gray-400 mt-2">Create, manage, and invite friends to your own contests.</p>
+    </div>
+    <div class="bg-gray-800 p-4 rounded-lg shadow">
+      <h3 class="text-lg font-semibold text-white">📊 Performance Tracking</h3>
+      <p class="text-gray-400 mt-2">Analyze your contest history and monitor your progress over time.</p>
+    </div>
+    <div class="bg-gray-800 p-4 rounded-lg shadow">
+      <h3 class="text-lg font-semibold text-white">👥 Community & Friends</h3>
+      <p class="text-gray-400 mt-2">Track friends’ performances and challenge each other.</p>
+    </div>
+  </div>
+</section>
+
+<footer id="foot"class="mt-20 text-center text-gray-500 text-sm py-6 border-t border-gray-800">
+  © 2025 Coder Arena. All rights reserved.
+</footer>
+
 
   <!-- ✅ SCRIPTS -->
   <script src="/Home/home.js"></script>
