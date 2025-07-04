@@ -12,12 +12,13 @@ router.get("/me", authController.getUser);
 router.get("/auth/google", passport.authenticate("google", {
   scope: ["profile", "email"]
 }));
-router.get("/auth/google/callback", 
+ router.get("/auth/google/callback",
   passport.authenticate("google", {
-    failureRedirect: "/login.html",
+    failureRedirect: "/Home/home.html", // or your custom error page
     session: true
   }),
-  async (req, res) => {
+  (req, res) => {
+    console.log("🔐 Google callback hit. req.user =", req.user);
     if (!req.user.username) {
       return res.redirect("/setusername/setusername.html");
     }
