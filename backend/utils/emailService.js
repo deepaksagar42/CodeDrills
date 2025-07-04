@@ -19,7 +19,7 @@ async function sendContestReminderEmail(toEmail, contest, senderName) {
       <h3>${contest.name}</h3>
       <p>Organized by: ${contest.orgName}</p>
       <p>Starts at: ${new Date(contest.startTime).toLocaleString()}</p>
-      <a href="http://localhost:3000/join-contest.html?id=${contest._id}">Join Contest</a>
+      <a href="https://codedrills.onrender.com/join-contest.html?id=${contest._id}">Join Contest</a>
     `,
   };
 
