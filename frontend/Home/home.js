@@ -82,7 +82,7 @@
       sessionStorage.removeItem("username");
       window.isAuthenticated = false;
       localStorage.removeItem("isLogged");
-      window.location.href = "/home/home.html";
+      window.location.href = "../Home/home.html";
     });
 
     // 👇 Protect links
