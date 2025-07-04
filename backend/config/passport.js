@@ -10,6 +10,7 @@ passport.use(new GoogleStrategy({
 },
 async (accessToken, refreshToken, profile, done) => {
   try {
+     console.log("🔐 Google profile:", profile);
     const email = profile.emails[0].value;
 
     let user = await User.findOne({ email });
@@ -35,8 +36,10 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser(async (id, done) => {
   try {
     const user = await User.findById(id);
+     console.log("🧠 Deserialized user:", user);
     done(null, user); 
   } catch (err) {
+     console.error("❌ Error in deserializeUser:", err);
     done(err, null);
   }
 });

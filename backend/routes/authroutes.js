@@ -12,17 +12,29 @@ router.get("/me", authController.getUser);
 router.get("/auth/google", passport.authenticate("google", {
   scope: ["profile", "email"]
 }));
- router.get("/auth/google/callback",
+router.get("/auth/google/callback", 
   passport.authenticate("google", {
-    failureRedirect: "/Home/home.html", // or your custom error page
+    failureRedirect: "/login.html",
     session: true
   }),
-  (req, res) => {
-    console.log("🔐 Google callback hit. req.user =", req.user);
-    if (!req.user.username) {
-      return res.redirect("/setusername/setusername.html");
-    }
-    res.redirect("/Home/home.html");
+  async (req, res) => {
+   
+  try{
+     console.log("✅ Google callback hit");
+      console.log("🔐 req.user = ", req.user);
+      if (!req.user) {
+        return res.status(400).send("User not found after Google login");
+      }
+      if (!req.user.username) {
+        return res.redirect("/setusername/setusername.html");
+      }
+      return res.redirect("/Home/home.html");
+  }
+  catch(err)
+  {
+     console.error("❌ Error during Google callback:", err);
+      res.status(500).send("Internal Server Error");
+  }
   }
 );
 
