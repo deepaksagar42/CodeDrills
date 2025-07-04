@@ -4,9 +4,10 @@ const cors = require("cors");
 const path = require("path");
 const session = require("express-session");
 require("dotenv").config();
-
+const passport = require("passport");
 
 const app = express();
+require("./config/passport");
 const PORT = 3000;
 
 mongoose.connect(process.env.MONGO_URI)
@@ -17,11 +18,23 @@ app.use(express.json());
 
 
 app.use(session({
-  secret: "secretkey123",
+  secret: "your-secret-key",
   resave: false,
-  saveUninitialized: false, 
-  cookie: { secure: false }, 
+  saveUninitialized: false,
+  store: MongoStore.create({
+    mongoUrl: "mongodb://localhost:27017/cp", // or MongoDB Atlas URL
+    collectionName: "sessions",
+    ttl: 60 * 60 * 24 * 7 // ⏰ 7 days (in seconds)
+  }),
+  cookie: {
+    httpOnly: true,
+    secure: false, // true if you're using HTTPS
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 💾 7 days (in ms)
+  }
 }));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(cors({
   origin: "https://codedrills.onrender.com", 
@@ -44,6 +57,8 @@ app.use("/api", userContestRoutes);
 
 const friendsRoutes=require("./routes/friendsroutes");
 app.use("/friends", friendsRoutes);
+
+app.use("/api", require("./routes/codeforcesRoutes"));
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(frontendPath, "Home/home.html"));

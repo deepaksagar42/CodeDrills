@@ -21,7 +21,9 @@
     "express-session": "^1.18.1",
     "googleapis": "^150.0.1",
     "mongoose": "^8.16.0",
-    "nodemailer": "^7.0.4"
+    "nodemailer": "^7.0.4",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

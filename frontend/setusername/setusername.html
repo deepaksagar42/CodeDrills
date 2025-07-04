@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Set Username</title>
+
+  <style>
+    .set-username-container {
+      max-width: 400px;
+      margin: 100px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 12px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #6366f1;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="set-username-container">
+    <h2>Set Your Username</h2>
+    <p>This is your first time logging in with Google. Please choose a username:</p>
+    <input type="text" id="username" placeholder="Choose a username" required />
+    <button onclick="submitUsername()">Submit</button>
+    <p id="error-msg" style="color: red;"></p>
+  </div>
+
+  <script src="setusername.js"></script>
+</body>
+</html>

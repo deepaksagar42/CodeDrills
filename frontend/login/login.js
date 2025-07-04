@@ -67,7 +67,8 @@ loginForm.addEventListener("submit", async (e) => {
     const params = new URLSearchParams(window.location.search);
     const redirect = params.get("redirect");
     const contestId = params.get("id");
-
+    localStorage.setItem("isLoggedIn", "true");
+    
     if (redirect === "contest" && contestId) {
       // ✅ Redirect to join-contest page with contest ID
       window.location.href = `/join-contest.html?id=${contestId}&redirect=contest`;
