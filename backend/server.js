@@ -5,6 +5,7 @@ const path = require("path");
 const session = require("express-session");
 require("dotenv").config();
 const passport = require("passport");
+const MongoStore = require("connect-mongo");
 
 const app = express();
 require("./config/passport");
@@ -22,7 +23,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: "mongodb://localhost:27017/cp", // or MongoDB Atlas URL
+    mongoUrl: "process.env.MONGO_URI", // or MongoDB Atlas URL
     collectionName: "sessions",
     ttl: 60 * 60 * 24 * 7 // ⏰ 7 days (in seconds)
   }),
