@@ -23,7 +23,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: "process.env.MONGO_URL", // or MongoDB Atlas URL
+    mongoUrl: process.env.MONGO_URL, // or MongoDB Atlas URL
     collectionName: "sessions",
     ttl: 60 * 60 * 24 * 7 // ⏰ 7 days (in seconds)
   }),
