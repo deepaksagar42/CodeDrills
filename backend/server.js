@@ -11,7 +11,7 @@ const app = express();
 require("./config/passport");
 const PORT = 3000;
 
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect("process.env.MONGO_URL")
   .then(() => console.log("✅ Connected to MongoDB"))
   .catch((err) => console.error("❌ MongoDB connection error:", err));
 
@@ -23,7 +23,7 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
-    mongoUrl: "process.env.MONGO_URI", // or MongoDB Atlas URL
+    mongoUrl: "process.env.MONGO_URL", // or MongoDB Atlas URL
     collectionName: "sessions",
     ttl: 60 * 60 * 24 * 7 // ⏰ 7 days (in seconds)
   }),
