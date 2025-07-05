@@ -98,7 +98,32 @@
       });
     }
    
-    // ❤️ Handle like click
+ 
+ const heartBtn = document.getElementById("heart-btn");
+const likeCount = document.getElementById("like-count");
+
+// 🔄 Fetch initial like data when page loads
+async function fetchLikeData() {
+  try {
+    const res = await fetch("/api/ratings", {
+      credentials: "include" // ✅ send session cookie
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch rating");
+
+    const data = await res.json();
+    likeCount.textContent = data.likes;
+
+    if (data.liked) {
+      heartBtn.classList.add("text-red-500"); // already liked
+      heartBtn.disabled = true; // prevent re-click
+    }
+  } catch (err) {
+    console.error("Error loading like data:", err);
+  }
+}
+
+// ❤️ Handle like click
 heartBtn.addEventListener("click", async () => {
   if (!window.isAuthenticated) {
     alert("Please login to like.");
