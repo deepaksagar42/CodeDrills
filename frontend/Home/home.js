@@ -65,6 +65,14 @@
 
 };
 
+const navToggle = document.getElementById("nav-toggle");
+const navMenu = document.getElementById("nav-menu");
+
+navToggle.addEventListener("click", () => {
+  navMenu.classList.toggle("hidden");
+});
+
+
     document.getElementById("signin-btn").addEventListener("click", () => {
       window.location.href = "/login/login.html";
     });
