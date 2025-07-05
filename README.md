@@ -1,9 +1,9 @@
 # Project Title
+CodeArena – A platform where users can create and participate in custom contests, track performance, and engage in problem-solving with Codeforces integration.
+🔗 Link: https://codedrills.onrender.com/
+⚠️ (Backend takes more than 50 seconds to restart, so please wait)
 
-A brief description of your project.  
-Example: `CodeDrills` – A competitive programming platform with custom contests, login/signup, Codeforces integration, and friend invitations.
 
----
 
 ## 🚀 Features
 
