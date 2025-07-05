@@ -97,6 +97,14 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 
   <script>
+
+     function changeCFHandle() {
+  const newHandle = prompt("Enter new Codeforces handle:");
+  if (newHandle) {
+    localStorage.setItem("cfHandle", newHandle.trim());
+    window.location.reload();
+  }
+}
     function getOrAskForCFHandle() {
       let handle = localStorage.getItem("cfHandle");
       if (!handle) {

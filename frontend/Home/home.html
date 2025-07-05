@@ -13,14 +13,24 @@
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap">
 
       <!-- Logo -->
-      <div class="flex items-center gap-2 text-white text-xl font-bold">
-        <svg viewBox="0 0 48 48" fill="none" width="32" xmlns="http://www.w3.org/2000/svg">
-          <path fill-rule="evenodd" clip-rule="evenodd"
-            d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z"
-            fill="currentColor" />
-        </svg>
-        CodeDrills
-      </div>
+           <div class="flex items-center gap-4 text-white text-xl font-bold">
+  <div class="flex items-center gap-2">
+    <svg viewBox="0 0 48 48" fill="none" width="32" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" clip-rule="evenodd"
+        d="M24 4H6V17.3333V30.6667H24V44H42V30.6667V17.3333H24V4Z"
+        fill="currentColor" />
+    </svg>
+    CodeDrills
+  </div>
+
+
+  <div class="flex items-center gap-1 text-white text-sm">
+    <button id="heart-btn" class="text-gray-300 text-xl hover:text-red-500 transition">
+      ❤️
+    </button>
+    <span id="like-count">0</span>
+  </div>
+</div>
 
       <!-- Hamburger (mobile) -->
       <button id="nav-toggle" class="lg:hidden text-white text-2xl focus:outline-none">

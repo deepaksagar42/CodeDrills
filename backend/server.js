@@ -64,6 +64,9 @@ app.use("/friends", friendsRoutes);
 
 app.use("/api", require("./routes/codeforcesRoutes"));
 
+const ratingRoutes = require("./routes/Rating");
+app.use("/api", ratingRoutes);
+
 app.get("/", (req, res) => {
   res.sendFile(path.join(frontendPath, "Home/home.html"));
 });

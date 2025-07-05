@@ -98,3 +98,36 @@
       });
     }
    
+    // ❤️ Handle like click
+heartBtn.addEventListener("click", async () => {
+  if (!window.isAuthenticated) {
+    alert("Please login to like.");
+    return;
+  }
+
+  try {
+    const res = await fetch("/api/ratings/like", {
+      method: "POST",
+      credentials: "include"
+    });
+
+    if (!res.ok) {
+      if (res.status === 401) {
+        alert("Please login to like.");
+      } else {
+        alert("Failed to submit like.");
+      }
+      return;
+    }
+
+    const data = await res.json();
+    likeCount.textContent = data.likes;
+    heartBtn.classList.add("text-red-500");
+    heartBtn.disabled = true; // prevent re-click
+  } catch (err) {
+    console.error("Error liking the post:", err);
+  }
+});
+
+// ⏬ Initial fetch on load
+fetchLikeData();
