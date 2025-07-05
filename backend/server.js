@@ -8,6 +8,7 @@ const passport = require("passport");
 const MongoStore = require("connect-mongo");
 
 const app = express();
+app.set("trust proxy", 1);
 require("./config/passport");
 const PORT = 3000;
 
@@ -23,7 +24,7 @@ app.use(cors({
 }));
 
 app.use(session({
-  secret: "your-secret-key",
+ secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   store: MongoStore.create({
