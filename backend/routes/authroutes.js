@@ -12,31 +12,35 @@ router.get("/me", authController.getUser);
 router.get("/auth/google", passport.authenticate("google", {
   scope: ["profile", "email"]
 }));
-router.get("/auth/google/callback", 
+router.get(
+  "/auth/google/callback",
   passport.authenticate("google", {
     failureRedirect: "/login.html",
-    session: true
+    session: true,
   }),
   async (req, res) => {
-   
-  try{
-     console.log("✅ Google callback hit");
+    try {
+      console.log("✅ Google callback hit");
       console.log("🔐 req.user = ", req.user);
+
       if (!req.user) {
         return res.status(400).send("User not found after Google login");
       }
+
+      // User logged in but hasn't chosen a username
       if (!req.user.username) {
         return res.redirect("/setusername/setusername.html");
       }
+
+      // All good, redirect to homepage
       return res.redirect("/Home/home.html");
-  }
-  catch(err)
-  {
-     console.error("❌ Error during Google callback:", err);
-      res.status(500).send("Internal Server Error");
-  }
+    } catch (err) {
+      console.error("❌ Error during Google callback:", err);
+      return res.status(500).send("Internal Server Error");
+    }
   }
 );
+
 
 router.post("/auth/set-username", async (req, res) => {
 

@@ -84,9 +84,8 @@ exports.logout = (req, res) =>
 
 // Auth check controller
 exports.getUser = (req, res) => {
-  if (!req.session.user) {
+  if (!req.isAuthenticated() || !req.user) {
     return res.status(401).json({ error: "Unauthorized" });
   }
-  res.json({ username: req.session.user.username });
+  return res.json({ username: req.user.username });
 };
-
