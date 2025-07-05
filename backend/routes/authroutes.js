@@ -10,7 +10,8 @@ router.post("/logout", authController.logout);
 router.get("/me", authController.getUser);
 
 router.get("/auth/google", passport.authenticate("google", {
-  scope: ["profile", "email"]
+  scope: ["profile", "email"],
+  prompt: "select_account"
 }));
 router.get(
   "/auth/google/callback",
